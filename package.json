@@ -7,7 +7,8 @@
     "test": "jest --watch",
     "dev": "concurrently \"webpack --watch --config config/webpack.dev.config.js\" \"npm run test\"",
     "start": "node dist/main.bundle.js",
-    "build": "webpack --config config/webpack.prod.config.js"
+    "build": "webpack --config config/webpack.prod.config.js",
+    "git": "git add . && git commit -m 'changes' && git push origin master"
   },
   "keywords": [
     "chess",

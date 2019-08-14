@@ -61,8 +61,6 @@ class ChessLogic {
     const org = getRowAndColumnFromString(origin);
     const dest = getRowAndColumnFromString(destination);
 
-    const orgField = this.__functionalGameState[org.row][org.column];
-
     try {
       this.__feldFuellen(dest.row, dest.column, org.row, org.column);
       this.__feldRaeumen(org.row, org.column);
@@ -107,7 +105,6 @@ class ChessLogic {
         orgField.row,
         orgField.column
       );
-
       if (calcedMoves.includes(destination)) {
         return true;
       }
@@ -165,12 +162,7 @@ class ChessLogic {
   ) => {
     switch (figType) {
       case "P":
-        return __getValidPawnMoves(
-          figSide,
-          row,
-          column,
-          this.__functionalGameState
-        );
+        return __getValidPawnMoves(row, column, this.__functionalGameState);
       case "N":
         return this.__getValidKnightMoves(figSide, row, column);
     }

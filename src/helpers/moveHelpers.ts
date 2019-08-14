@@ -1,54 +1,71 @@
 // types
 import { TSide, IFunctionalGameState } from "../types";
 
+interface IpMovesEntry {
+  row: number;
+  column: number;
+  dir: "s" | "d";
+}
+
+interface IpMoves {
+  b: IpMovesEntry[];
+  w: IpMovesEntry[];
+}
+
 export const __getValidPawnMoves = (
-  side: TSide,
   row: number,
   column: number,
   FGameState: IFunctionalGameState
 ) => {
-  const field = FGameState[row][column];
-  if (!field.validMoves) {
-    let validMoves = [];
-    if (side === "w") {
-      // straight Moves
-      const field1 = FGameState[String(row + 1)][String(column)];
-      if (!field1.figureType) {
-        validMoves.push(field1.field);
-      }
-      const field2 = FGameState[row + 2][column];
-      if (!field2.figureType) {
-        validMoves.push(field2.field);
-      }
-      // diagonal Moves
-      const field3 = FGameState[row + 1][column + 1];
-      if (field3.figureType) {
-        validMoves.push(field3.field);
-      }
-      const field4 = FGameState[row + 1][column - 1];
-      if (field4.figureType) {
-        validMoves.push(field4.field);
-      }
-    } else {
-      const field1 = FGameState[String(row - 1)][String(column)];
-      if (!field1.figureType) {
-        validMoves.push(field1.field);
-      }
-      const field2 = FGameState[String(row - 2)][column];
-      if (!field2.figureType) {
-        validMoves.push(field2.field);
-      }
-      // diagonal Moves
-      const field3 = FGameState[String(row - 1)][column + 1];
-      if (field3.figureType) {
-        validMoves.push(field3.field);
-      }
-      const field4 = FGameState[String(row - 1)][String(column - 1)];
-      if (field4.figureType) {
-        validMoves.push(field4.field);
-      }
-    }
-    return validMoves;
+  const possibleMoves: IpMoves = {
+    b: [
+      { row: row - 2, column: column, dir: "s" },
+      { row: row - 1, column: column, dir: "s" },
+      { row: row - 1, column: column + 1, dir: "d" },
+      { row: row - 1, column: column - 1, dir: "d" }
+    ],
+    w: [
+      { row: row + 2, column: column, dir: "s" },
+      { row: row + 1, column: column, dir: "s" },
+      { row: row + 1, column: column + 1, dir: "d" },
+      { row: row + 1, column: column - 1, dir: "d" }
+    ]
+  };
+  const orgField = FGameState[row][column];
+  if (!orgField.validMoves) {
+    return __getValidPawnMovesBySide(
+      possibleMoves[orgField.side],
+      FGameState,
+      orgField
+    );
   }
-  return field.validMoves;
+  return orgField.validMoves;
+};
+
+const __getValidPawnMovesBySide = (possibleMoves, FGameState, orgField) => {
+  let validMoves = [];
+
+  for (let move in possibleMoves) {
+    const possibleMove = possibleMoves[move];
+    const cur = FGameState[possibleMove.row][possibleMove.column];
+
+    if (cur.side === null && possibleMove.dir === "s") {
+      validMoves.push(cur.field);
+    } else if (
+      cur.side === __getOppositeSite(orgField.side) &&
+      possibleMove.dir === "d"
+    ) {
+      validMoves.push(cur.field);
+    }
+  }
+  return validMoves;
+};
+
+const __getOppositeSite = (side: "w" | "b") => {
+  switch (side) {
+    case "w":
+      return "b";
+    case "b":
+      return "w";
+  }
 };
