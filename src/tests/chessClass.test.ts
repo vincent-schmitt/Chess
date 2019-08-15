@@ -44,46 +44,33 @@ describe("Testing chess instance with empty GameState (start)", () => {
       });
     });
     describe("Methode: move", () => {
+      test("Empty origin move returns false", () => {
+        expect(Game.move("F3", "G2")).toEqual(false);
+      });
+
       describe("Test Pawn Moves", () => {
         test("valid Pawn moves get executed", () => {
-          expect(Game.move("A2", "A3")[3][1].figureType).toEqual("P");
-          expect(Game.move("D2", "D3")[2][4].figureType).toBeNull();
+          expect(Game.move("A2", "A3")[3][1].figure.type).toEqual("P");
+          expect(Game.move("D2", "D3")[2][4].figure).toBeNull();
         });
         test("invalid Pawn moves return false", () => {
           expect(Game.move("B2", "B5")).toEqual(false);
           expect(Game.move("C2", "B3")).toEqual(false);
         });
+        test("GameState updates correct", () => {
+          expect(Game.getFunctionalGameState()[2][1].figure).toBeNull();
+          expect(Game.getFunctionalGameState()[3][1].figure.type).toEqual("P");
+        });
       });
 
       describe("Test Knight Moves", () => {
         test("valid knight moves get executed", () => {
-          expect(Game.move("B1", "C3")[3][3].figureType).toEqual("N");
-          expect(Game.move("G1", "H3")[1][7].figureType).toBeNull();
+          expect(Game.move("B1", "C3")[3][3].figure.type).toEqual("N");
+          expect(Game.move("G1", "H3")[1][7].figure).toBeNull();
         });
-      });
-
-      test("GameState updates correct", () => {
-        expect(Game.getFunctionalGameState()[2][1]).toEqual({
-          validMoves: null,
-          figureType: null,
-          side: null,
-          field: "A2",
-          row: 2,
-          column: 1,
-          columnName: "A",
-          fieldColor: 1,
-          GameField: true
-        });
-        expect(Game.getFunctionalGameState()[3][1]).toEqual({
-          validMoves: null,
-          figureType: "P",
-          side: "w",
-          field: "A3",
-          row: 3,
-          column: 1,
-          columnName: "A",
-          fieldColor: 0,
-          GameField: true
+        test("invalid Knight moves return false", () => {
+          expect(Game.move("C3", "A3")).toEqual(false);
+          expect(Game.move("H3", "F2")).toEqual(false);
         });
       });
     });

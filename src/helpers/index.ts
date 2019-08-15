@@ -51,9 +51,7 @@ const createEmptyRow = (row: number) => {
 
 const createEmptyStartField = (row: string, column: number) => {
   return {
-    validMoves: null,
-    figureType: null,
-    side: null,
+    figure: null,
     field: `${columnConst[column]}${Number(row)}`,
     row: Number(row),
     column: column,
@@ -79,9 +77,9 @@ export const createStart = (): IGameState => {
 export const createStartField = (row: number, column: number) => {
   const figure = getStartFigureForField(row, column);
   return {
-    validMoves: null,
-    figureType: figure ? figure[0] : null,
-    side: figure ? figure[1] : null,
+    figure: figure
+      ? { type: figure[0], side: figure[1], validMoves: null }
+      : null,
     field: `${columnConst[column]}${row}`,
     row: row,
     column: column,

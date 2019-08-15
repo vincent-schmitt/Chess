@@ -1,5 +1,5 @@
 // types
-import { TSide, IFunctionalGameState } from "../types";
+import { TSide, IFunctionalGameState } from "../types/index";
 
 interface IpMovesEntry {
   row: number;
@@ -32,9 +32,9 @@ export const __getValidPawnMoves = (
     ]
   };
   const orgField = FGameState[row][column];
-  if (!orgField.validMoves) {
+  if (!orgField.figure.validMoves) {
     return __getValidPawnMovesBySide(
-      possibleMoves[orgField.side],
+      possibleMoves[orgField.figure.side],
       FGameState,
       orgField
     );
@@ -49,13 +49,17 @@ const __getValidPawnMovesBySide = (possibleMoves, FGameState, orgField) => {
     const possibleMove = possibleMoves[move];
     const cur = FGameState[possibleMove.row][possibleMove.column];
 
-    if (cur.side === null && possibleMove.dir === "s") {
-      validMoves.push(cur.field);
-    } else if (
-      cur.side === __getOppositeSite(orgField.side) &&
-      possibleMove.dir === "d"
-    ) {
-      validMoves.push(cur.field);
+    if (cur.GameField) {
+      if (cur.figure === null && possibleMove.dir === "s") {
+        validMoves.push(cur.field);
+      } else if (cur.figure) {
+        if (
+          cur.figure.side === __getOppositeSite(orgField.figure.side) &&
+          possibleMove.dir === "d"
+        ) {
+          validMoves.push(cur.field);
+        }
+      }
     }
   }
   return validMoves;

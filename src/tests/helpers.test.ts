@@ -31,9 +31,12 @@ test("getStartFigureForField 'at helpers'", () => {
 
 test("createStartField 'at helpers'", () => {
   expect(createStartField(1, 8)).toEqual({
-    validMoves: null,
-    figureType: "R",
-    side: "w",
+    figure: {
+      validMoves: null,
+      type: "R",
+      side: "w"
+    },
+
     field: "H1",
     row: 1,
     column: 8,
@@ -42,9 +45,12 @@ test("createStartField 'at helpers'", () => {
     GameField: true
   });
   expect(createStartField(8, 7)).toEqual({
-    validMoves: null,
-    figureType: "N",
-    side: "b",
+    figure: {
+      validMoves: null,
+      type: "N",
+      side: "b"
+    },
+
     field: "G8",
     row: 8,
     column: 7,

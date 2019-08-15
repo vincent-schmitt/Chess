@@ -23,6 +23,12 @@ export type TFunctionalColumnString =
   | "8"
   | "9";
 
+export interface IFigType {
+  validMoves: null | string[];
+  type: TFigureType;
+  side: TSide;
+}
+
 export type TFunctionalRowNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type TFunctionalColumnNumber = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -47,9 +53,11 @@ export type TFigureType = "P" | "R" | "N" | "B" | "Q" | "K";
 export type TSide = "w" | "b";
 
 export interface IGameStateEntry {
-  validMoves: null | string[];
-  figure: TFigure;
-  figureType: TFigureType;
+  figure: {
+    validMoves: null | string[];
+    figure: TFigure;
+    type: TFigureType;
+  };
   side: TSide;
   field: string;
   row: TrowNumber;

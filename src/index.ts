@@ -4,12 +4,12 @@ import {
   IFunctionalGameState,
   TFigureType,
   TSide,
-  IGameStateEntry
+  IGameStateEntry,
+  IFigType
 } from "./types";
 
 // helpers
 import {
-  createStart,
   createFunctionalGameState,
   getRowAndColumnFromString
 } from "./helpers";
@@ -18,7 +18,6 @@ import { __getValidPawnMoves } from "./helpers/moveHelpers";
 class ChessLogic {
   // types
   initialGameState: IGameState;
-  private __currentGameState: IGameState;
   private __functionalGameState: IFunctionalGameState;
 
   // constructor
@@ -27,34 +26,104 @@ class ChessLogic {
     this.__init(GameState);
   }
 
-  __init = GameState => {
+  __init = (GameState: IGameState) => {
     this.__functionalGameState = createFunctionalGameState(GameState);
-    GameState
-      ? (this.__currentGameState = GameState)
-      : (this.__currentGameState = createStart());
   };
+
   // Methods
-  getGameState = (): IGameState => this.__currentGameState;
+  getGameState = (): IGameState => {
+    return this.__getSimplifiedGameState();
+  };
 
   getFunctionalGameState = (): IFunctionalGameState =>
     this.__functionalGameState;
 
   printGameState = () => {
-    for (let r of Object.keys(this.__currentGameState)) {
+    const currentGameState = this.getGameState();
+    for (let r of Object.keys(currentGameState)) {
       console.log(r);
-      for (let c of Object.keys(this.__currentGameState[r])) {
-        console.log(c, this.__currentGameState[r][c]);
+      for (let c of Object.keys(currentGameState[r])) {
+        console.log(c, currentGameState[r][c]);
       }
     }
   };
 
-  move = (origin: string, destination: string) => {
+  move = (
+    origin: string,
+    destination: string
+  ): false | IFunctionalGameState => {
     if (this._validateMove(origin, destination)) {
       if (this.__executeMove(origin, destination)) {
         return this.__functionalGameState;
       }
     }
     return false;
+  };
+
+  getValidMoves = (
+    row: number | false = false,
+    column: number | false = false
+  ) => {
+    if (row !== false && column !== false) {
+      this.__setValidMoves(
+        row,
+        column,
+        this.__getValidMoveForField(row, column)
+      );
+      return this.__functionalGameState[row][column].validMoves;
+    } else {
+      const filledFields = this._getFilledFields();
+
+      filledFields.forEach(field => {
+        this.__setValidMoves(
+          field.row,
+          field.column,
+          this.__getValidMoveForField(field.row, field.column)
+        );
+      });
+      return this.__functionalGameState;
+    }
+  };
+
+  _validateMove = (origin: string, destination: string) => {
+    const org = getRowAndColumnFromString(origin);
+    const orgField = this.__functionalGameState[org.row][org.column];
+
+    if (orgField.figure) {
+      const validMoves = orgField.figure.validMoves;
+
+      if (validMoves === null) {
+        const calcedMoves = this.__getValidMoves(
+          orgField.figure,
+          orgField.row,
+          orgField.column
+        );
+        if (calcedMoves.includes(destination)) {
+          return true;
+        }
+      } else {
+        if (validMoves.includes(destination)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  _getFilledFields = () => {
+    const filledFields = [];
+    for (let row in this.__functionalGameState) {
+      if (row !== "0" && row !== "9") {
+        for (let field in this.__functionalGameState[row]) {
+          if (field !== "0" && field !== "9") {
+            if (this.__functionalGameState[row][field].figure) {
+              filledFields.push(this.__functionalGameState[row][field]);
+            }
+          }
+        }
+      }
+    }
+    return filledFields;
   };
 
   __executeMove = (origin: string, destination: string) => {
@@ -79,67 +148,15 @@ class ChessLogic {
     const destField = this.__functionalGameState[destRow][destCol];
     const orgField = this.__functionalGameState[orgRow][orgCol];
 
-    destField.validMoves = null;
-    destField.figureType = orgField.figureType;
-    destField.side = orgField.side;
+    destField.figure = {
+      validMoves: null,
+      type: orgField.figure.type,
+      side: orgField.side
+    };
   };
 
   __feldRaeumen = (row: number, column: number) => {
-    const Field = this.__functionalGameState[row][column];
-
-    Field.validMoves = null;
-    Field.figureType = null;
-    Field.side = null;
-  };
-
-  _validateMove = (origin: string, destination: string) => {
-    const org = getRowAndColumnFromString(origin);
-    const orgField = this.__functionalGameState[org.row][org.column];
-
-    const validMoves = orgField.validMoves;
-
-    if (validMoves === null) {
-      const calcedMoves = this.__getValidMoves(
-        orgField.figureType,
-        orgField.side,
-        orgField.row,
-        orgField.column
-      );
-      if (calcedMoves.includes(destination)) {
-        return true;
-      }
-    } else {
-      if (validMoves.includes(destination)) {
-        return true;
-      }
-    }
-
-    return false;
-  };
-
-  getValidMoves = (
-    row: number | false = false,
-    column: number | false = false
-  ) => {
-    if (row !== false && column !== false) {
-      this.__setValidMoves(
-        row,
-        column,
-        this.__getValidMoveForField(row, column)
-      );
-      return this.__functionalGameState[row][column].validMoves;
-    } else {
-      Object.keys(this.__currentGameState).forEach(rowN => {
-        Object.keys(this.__currentGameState[rowN]).forEach(columnN => {
-          this.__setValidMoves(
-            Number(rowN),
-            Number(columnN),
-            this.__getValidMoveForField(Number(rowN), Number(columnN))
-          );
-        });
-      });
-      return this.__functionalGameState;
-    }
+    this.__functionalGameState[row][column].figure = null;
   };
 
   __setValidMoves = (row: number, column: number, moves: string[] | false) => {
@@ -147,27 +164,23 @@ class ChessLogic {
   };
 
   __getValidMoveForField = (row: number, column: number) => {
-    const field = this.__currentGameState[String(row)][String(column)];
-    if (field.figureType && field.side) {
-      return this.__getValidMoves(field.figureType, field.side, row, column);
+    const field = this.__functionalGameState[row][column];
+    if (field.figure) {
+      return this.__getValidMoves(field.figure, row, column);
     }
     return false;
   };
 
-  __getValidMoves = (
-    figType: TFigureType,
-    figSide: TSide,
-    row: number,
-    column: number
-  ) => {
-    switch (figType) {
+  __getValidMoves = (figure: IFigType, row: number, column: number) => {
+    switch (figure.type) {
       case "P":
         return __getValidPawnMoves(row, column, this.__functionalGameState);
       case "N":
-        return this.__getValidKnightMoves(figSide, row, column);
+        return this.__getValidKnightMoves(row, column);
     }
   };
-  __getValidKnightMoves = (side: TSide, row: number, column: number) => {
+
+  __getValidKnightMoves = (row: number, column: number) => {
     const field = this.__functionalGameState[row][column];
     if (!field.validMoves) {
       const possibleMoves = [
@@ -184,13 +197,9 @@ class ChessLogic {
       let validMoves = [];
 
       possibleMoves.forEach(fieldN => {
-        const isValid = __isValidField(
-          fieldN[0],
-          fieldN[1],
-          this.__functionalGameState
-        );
+        const isValid = this.__isValidField(fieldN[0], fieldN[1]);
         if (isValid) {
-          if (isValid.side !== side) {
+          if (isValid.side !== field.figure.side) {
             validMoves.push(isValid.field);
           }
         }
@@ -200,22 +209,32 @@ class ChessLogic {
       return field.validMoves;
     }
   };
-}
 
-const __isValidField = (
-  row: number,
-  column: number,
-  FGameState: IFunctionalGameState
-) => {
-  try {
-    const field = FGameState[row][column];
-    if (field.GameField) {
-      return field;
+  __getSimplifiedGameState = (): IGameState => {
+    // @ts-ignore
+    let simpleState: IGameState = {};
+    for (let row in Object.keys(this.__functionalGameState)) {
+      if (row !== "0" && row !== "9") {
+        const cRow = Object.assign({}, this.__functionalGameState[row]);
+        delete cRow["0"];
+        delete cRow["9"];
+        simpleState[row] = cRow;
+      }
     }
-    return false;
-  } catch {
-    return false;
-  }
-};
+    return simpleState;
+  };
+
+  __isValidField = (row: number, column: number) => {
+    try {
+      const field = this.__functionalGameState[row][column];
+      if (field.GameField) {
+        return field;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+}
 
 export default ChessLogic;
