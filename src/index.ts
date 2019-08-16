@@ -31,34 +31,12 @@ class ChessLogic {
   };
 
   // Methods
-  getGameState = (): IGameState => {
-    return this.__getSimplifiedGameState();
-  };
+
+  // getters
+  getGameState = (): IGameState => this.__getSimplifiedGameState();
 
   getFunctionalGameState = (): IFunctionalGameState =>
     this.__functionalGameState;
-
-  printGameState = () => {
-    const currentGameState = this.getGameState();
-    for (let r of Object.keys(currentGameState)) {
-      console.log(r);
-      for (let c of Object.keys(currentGameState[r])) {
-        console.log(c, currentGameState[r][c]);
-      }
-    }
-  };
-
-  move = (
-    origin: string,
-    destination: string
-  ): false | IFunctionalGameState => {
-    if (this._validateMove(origin, destination)) {
-      if (this.__executeMove(origin, destination)) {
-        return this.__functionalGameState;
-      }
-    }
-    return false;
-  };
 
   getValidMoves = (
     row: number | false = false,
@@ -83,6 +61,28 @@ class ChessLogic {
       });
       return this.__functionalGameState;
     }
+  };
+
+  printGameState = () => {
+    const currentGameState = this.getGameState();
+    for (let r of Object.keys(currentGameState)) {
+      console.log(r);
+      for (let c of Object.keys(currentGameState[r])) {
+        console.log(c, currentGameState[r][c]);
+      }
+    }
+  };
+
+  move = (
+    origin: string,
+    destination: string
+  ): false | IFunctionalGameState => {
+    if (this._validateMove(origin, destination)) {
+      if (this.__executeMove(origin, destination)) {
+        return this.__functionalGameState;
+      }
+    }
+    return false;
   };
 
   _validateMove = (origin: string, destination: string) => {

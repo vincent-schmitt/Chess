@@ -4,7 +4,7 @@ import { TSide, IFunctionalGameState } from "../types/index";
 interface IpMovesEntry {
   row: number;
   column: number;
-  dir: "s" | "d";
+  dir: "s" | "2s" | "d";
 }
 
 interface IpMoves {
@@ -19,16 +19,41 @@ export const __getValidPawnMoves = (
 ) => {
   const possibleMoves: IpMoves = {
     b: [
-      { row: row - 2, column: column, dir: "s" },
+      {
+        row: row - 2,
+        column: column,
+        dir: "2s"
+      },
       { row: row - 1, column: column, dir: "s" },
-      { row: row - 1, column: column + 1, dir: "d" },
-      { row: row - 1, column: column - 1, dir: "d" }
+      {
+        row: row - 1,
+        column: column + 1,
+        dir: "d"
+      },
+      {
+        row: row - 1,
+        column: column - 1,
+        dir: "d"
+      }
     ],
     w: [
-      { row: row + 2, column: column, dir: "s" },
+      {
+        row: row + 2,
+        column: column,
+        dir: "2s"
+      },
       { row: row + 1, column: column, dir: "s" },
-      { row: row + 1, column: column + 1, dir: "d" },
-      { row: row + 1, column: column - 1, dir: "d" }
+
+      {
+        row: row + 1,
+        column: column + 1,
+        dir: "d"
+      },
+      {
+        row: row + 1,
+        column: column - 1,
+        dir: "d"
+      }
     ]
   };
   const orgField = FGameState[row][column];
@@ -52,13 +77,14 @@ const __getValidPawnMovesBySide = (possibleMoves, FGameState, orgField) => {
     if (cur.GameField) {
       if (cur.figure === null && possibleMove.dir === "s") {
         validMoves.push(cur.field);
-      } else if (cur.figure) {
-        if (
-          cur.figure.side === __getOppositeSite(orgField.figure.side) &&
-          possibleMove.dir === "d"
-        ) {
-          validMoves.push(cur.field);
-        }
+      } else if (
+        possibleMove.dir === "2s" &&
+        (orgField.row === 2 || orgField.row === 7) &&
+        cur.figure === null
+      ) {
+        validMoves.push(cur.field);
+      } else if (cur.figure && cur.figure.side !== orgField.figure.side) {
+        validMoves.push(cur.field);
       }
     }
   }
