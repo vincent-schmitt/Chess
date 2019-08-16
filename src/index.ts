@@ -73,6 +73,100 @@ class ChessLogic {
     }
   };
 
+  drawGameState = () => {
+    const GameState = this.getGameState();
+    let pGame = [];
+    for (let row of Object.keys(GameState)) {
+      let pRow = [];
+      for (let field of Object.keys(GameState[row])) {
+        if (GameState[row][field].figure) {
+          pRow.push(
+            GameState[row][field].figure.type +
+              GameState[row][field].figure.side
+          );
+        } else {
+          pRow.push("00");
+        }
+      }
+      pGame.push(pRow);
+    }
+    console.log(
+      "\n",
+      pGame[0][0],
+      pGame[0][1],
+      pGame[0][2],
+      pGame[0][3],
+      pGame[0][4],
+      pGame[0][5],
+      pGame[0][6],
+      pGame[0][7],
+      "\n",
+      pGame[1][0],
+      pGame[1][1],
+      pGame[1][2],
+      pGame[1][3],
+      pGame[1][4],
+      pGame[1][5],
+      pGame[1][6],
+      pGame[1][7],
+      "\n",
+      pGame[2][0],
+      pGame[2][1],
+      pGame[2][2],
+      pGame[2][3],
+      pGame[2][4],
+      pGame[2][5],
+      pGame[2][6],
+      pGame[2][7],
+      "\n",
+      pGame[3][0],
+      pGame[3][1],
+      pGame[3][2],
+      pGame[3][3],
+      pGame[3][4],
+      pGame[3][5],
+      pGame[3][6],
+      pGame[3][7],
+      "\n",
+      pGame[4][0],
+      pGame[4][1],
+      pGame[4][2],
+      pGame[4][3],
+      pGame[4][4],
+      pGame[4][5],
+      pGame[4][6],
+      pGame[4][7],
+      "\n",
+      pGame[5][0],
+      pGame[5][1],
+      pGame[5][2],
+      pGame[5][3],
+      pGame[5][4],
+      pGame[5][5],
+      pGame[5][6],
+      pGame[5][7],
+      "\n",
+      pGame[6][0],
+      pGame[6][1],
+      pGame[6][2],
+      pGame[6][3],
+      pGame[6][4],
+      pGame[6][5],
+      pGame[6][6],
+      pGame[6][7],
+      "\n",
+      pGame[7][0],
+      pGame[7][1],
+      pGame[7][2],
+      pGame[7][3],
+      pGame[7][4],
+      pGame[7][5],
+      pGame[7][6],
+      pGame[7][7],
+      "\n"
+    );
+  };
+
   move = (
     origin: string,
     destination: string

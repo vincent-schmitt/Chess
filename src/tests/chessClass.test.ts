@@ -3,7 +3,7 @@ import chess from "../index";
 // constant
 describe("Testing chess instance with empty GameState (start)", () => {
   let Game = new chess();
-
+  Game.drawGameState();
   describe("chess instance gets initialized with valid states", () => {
     test("new instance creates startGameState", () => {
       expect(Object.keys(Game.getGameState())).toHaveLength(8);
