@@ -24,10 +24,10 @@
     "jest-preset-typescript": "^1.2.0",
     "run-node-webpack-plugin": "^1.2.2",
     "ts-jest": "^24.0.2",
-    "ts-loader": "^6.0.4",
+    "ts-loader": "^9.4.2",
     "typescript": "^3.5.3",
-    "webpack": "^4.39.1",
-    "webpack-cli": "^3.3.6"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   },
   "jest": {
     "roots": [
